@@ -23,8 +23,10 @@ def compute_confidence(recommendations: list[dict[str, str]], variants_count: in
         }
 
     variant_impact = sum(SEVERITY_WEIGHT.get(item["severity"], 0.4) for item in recommendations) / len(recommendations)
-    actionable = [item for item in recommendations if item["risk_label"] != "No Actionable PGx Rule Found"]
-    gene_drug_relevance = len(actionable) / max(drugs_count, 1)
+    actionable_drugs = {
+        item["drug"] for item in recommendations if item["risk_label"] != "No Actionable PGx Rule Found"
+    }
+    gene_drug_relevance = min(1.0, len(actionable_drugs) / max(drugs_count, 1))
     guideline_support = sum(GUIDELINE_SUPPORT_BY_GENE.get(item["gene"], 0.5) for item in recommendations) / len(recommendations)
     data_completeness = min(1.0, variants_count / 3)
 

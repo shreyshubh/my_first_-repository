@@ -38,6 +38,24 @@ STAR_PHENOTYPE_MAP = {
     },
 }
 
+PHENOTYPE_PRIORITY = {
+    "Poor Metabolizer": 5,
+    "No Function": 5,
+    "Low Activity": 4,
+    "Intermediate Metabolizer": 3,
+    "Decreased Function": 3,
+    "Normal Metabolizer": 2,
+    "Normal Activity": 2,
+    "Normal Function": 2,
+    "Rapid Metabolizer": 1,
+    "Indeterminate": 0,
+}
+
 
 def infer_phenotype(gene: str, star_allele: str) -> str:
-    return STAR_PHENOTYPE_MAP.get(gene, {}).get(star_allele.upper(), "Indeterminate")
+    allele_tokens = [token.strip().upper() for token in star_allele.replace("|", "/").split("/") if token.strip()]
+    if not allele_tokens:
+        return "Indeterminate"
+
+    phenotypes = [STAR_PHENOTYPE_MAP.get(gene, {}).get(token, "Indeterminate") for token in allele_tokens]
+    return max(phenotypes, key=lambda item: PHENOTYPE_PRIORITY.get(item, 0))

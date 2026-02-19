@@ -1,20 +1,24 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
-class PatientSummary(BaseModel):
+class StrictBaseModel(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class PatientSummary(StrictBaseModel):
     genes_detected: list[str]
     variants_considered: int
     drugs_requested: list[str]
 
 
-class MatchedVariant(BaseModel):
+class MatchedVariant(StrictBaseModel):
     gene: str
     star_allele: str
     rsid: str | None = None
     phenotype: str
 
 
-class DrugRecommendation(BaseModel):
+class DrugRecommendation(StrictBaseModel):
     drug: str
     gene: str
     phenotype: str
@@ -23,19 +27,19 @@ class DrugRecommendation(BaseModel):
     recommendation: str
 
 
-class ConfidenceBreakdown(BaseModel):
+class ConfidenceBreakdown(StrictBaseModel):
     variant_impact: float
     gene_drug_relevance: float
     guideline_support: float
     data_completeness: float
 
 
-class Confidence(BaseModel):
+class Confidence(StrictBaseModel):
     score: float
     breakdown: ConfidenceBreakdown
 
 
-class AnalyzeResponse(BaseModel):
+class AnalyzeResponse(StrictBaseModel):
     patient_summary: PatientSummary
     matched_variants: list[MatchedVariant]
     drug_recommendations: list[DrugRecommendation]
